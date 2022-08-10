@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Text;
+using System.Text.Json;
+using Azure.Messaging.ServiceBus;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.eShopWeb.ApplicationCore.Entities;
 using Microsoft.eShopWeb.ApplicationCore.Interfaces;
@@ -48,6 +51,37 @@ public class IndexModel : PageModel
 
         BasketModel = await _basketViewModelService.Map(basket);
 
+        var connectionString = "Endpoint=sb://cloudx-service-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=vBISOdaJPvwtZ9VhKHE7CUeqShFDnio4DFEgaUA0x9s=";
+        var queueName = "orderreserver";
+        
+        await using var client = new ServiceBusClient(connectionString);
+        await using ServiceBusSender sender = client.CreateSender(queueName);
+        try
+        {
+            string messageBody = JsonSerializer.Serialize(BasketModel);
+            var message = new ServiceBusMessage(messageBody);
+            Console.WriteLine($"Sending message: {messageBody}");
+            await sender.SendMessageAsync(message);
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine($"{DateTime.Now} :: Exception: {exception.Message}");
+        }
+        finally
+        {
+            await sender.DisposeAsync();
+            await client.DisposeAsync();
+        }
+        // try
+        // {
+        //     using HttpClient httpClient = new HttpClient();
+        //     var content = new StringContent(JsonSerializer.Serialize(BasketModel), Encoding.UTF8, "application/json");
+        //     await httpClient.PostAsync("https://cloudx-order-item.azurewebsites.net/api/OrderItemsReserver", content);
+        // }
+        // catch (Exception e)
+        // {
+        //     Console.WriteLine(e);
+        // }
         return RedirectToPage();
     }
 

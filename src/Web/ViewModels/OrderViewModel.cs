@@ -8,6 +8,7 @@ public class OrderViewModel
 {
     private const string DEFAULT_STATUS = "Pending";
 
+    public string Id { get; set; }
     public int OrderNumber { get; set; }
     public DateTimeOffset OrderDate { get; set; }
     public decimal Total { get; set; }
