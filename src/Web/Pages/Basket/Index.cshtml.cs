@@ -51,8 +51,8 @@ public class IndexModel : PageModel
 
         BasketModel = await _basketViewModelService.Map(basket);
 
-        var connectionString = "Endpoint=sb://cloudx-service-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=vBISOdaJPvwtZ9VhKHE7CUeqShFDnio4DFEgaUA0x9s=";
-        var queueName = "orderreserver";
+        var connectionString = "Endpoint=sb://cloudx-service-bus.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=RXa6UVya1lBAabHbTjyAjNjUU9aY/hqrp06K1SjkwYM=";
+        var queueName = "orderitemsreserver";
         
         await using var client = new ServiceBusClient(connectionString);
         await using ServiceBusSender sender = client.CreateSender(queueName);
@@ -72,16 +72,7 @@ public class IndexModel : PageModel
             await sender.DisposeAsync();
             await client.DisposeAsync();
         }
-        // try
-        // {
-        //     using HttpClient httpClient = new HttpClient();
-        //     var content = new StringContent(JsonSerializer.Serialize(BasketModel), Encoding.UTF8, "application/json");
-        //     await httpClient.PostAsync("https://cloudx-order-item.azurewebsites.net/api/OrderItemsReserver", content);
-        // }
-        // catch (Exception e)
-        // {
-        //     Console.WriteLine(e);
-        // }
+        
         return RedirectToPage();
     }
 
